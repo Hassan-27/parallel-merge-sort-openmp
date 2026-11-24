@@ -180,6 +180,47 @@ def model_table():
     return f"<table class='small long'>{head}{''.join(body)}</table>"
 
 
+def tests_table():
+    """Per-distribution results of `pdcsort test`, parsed from results/test_log.txt."""
+    p = RES / "test_log.txt"
+    if not p.exists():
+        return ""
+    import re
+    rows_t, total = [], ""
+    for line in p.read_text(errors="replace").splitlines():
+        m = re.match(r"\s*([\w/ -]+?)\s*:\s*(\d+) passed(?:, (\d+) failed)?", line)
+        if m:
+            rows_t.append((m.group(1), m.group(2), m.group(3) or "0"))
+        elif line.startswith("TOTAL"):
+            total = line.strip()
+    body = "".join(f"<tr><td>{d}</td><td>{ok}</td><td>{bad}</td></tr>" for d, ok, bad in rows_t)
+    return (f"<table class=small><tr><th>Input distribution</th><th>Passed</th><th>Failed</th></tr>{body}</table>"
+            f"<p style='text-align:center;font-size:9pt'>{total}</p>")
+
+
+def cutoff_table():
+    if not cut:
+        return ""
+    cs = sorted({r["cutoff"] for r in cut})
+    def c(algo, co):
+        r = next((r for r in cut if r["algo"] == algo and r["cutoff"] == co), None)
+        return ("<td>-</td><td>-</td>" if r is None else
+                f"<td>{r['median_s']:.3f}</td><td>{r['model_s']:.3f}</td>")
+    head = ("<tr><th rowspan=2>Cutoff (elements)</th><th colspan=2>2-way</th><th colspan=2>4-way</th></tr>"
+            "<tr><th>Measured (s)</th><th>Model (s)</th><th>Measured (s)</th><th>Model (s)</th></tr>")
+    body = "".join(f"<tr><td>{co:,}</td>{c('par2', co)}{c('par4', co)}</tr>" for co in cs)
+    return f"<table class=small>{head}{body}</table>"
+
+
+def calib_table():
+    ks = sorted(bw, key=int)
+    head = "<tr><th>Concurrent threads</th>" + "".join(f"<th>{k}</th>" for k in ks) + "</tr>"
+    r1 = "<tr><td>Copy bandwidth (GB/s)</td>" + "".join(f"<td>{bw[k]:.1f}</td>" for k in ks) + "</tr>"
+    r2 = "<tr><td>Task overhead (&micro;s)</td>" + "".join(
+        f"<td>{task_us.get(k, 0):.2f}</td>" for k in ks) + "</tr>"
+    return f"<table class=small>{head}{r1}{r2}</table>"
+
+
 # ----------------------------------------------------------------- hardware info
 def cpu_name():
     try:
@@ -389,7 +430,7 @@ speedup is {best4['speedup']:.2f}&times; (p={best4['threads']}). </li>
 <li><b>Diminishing returns:</b> speedup grows quickly up to 4 threads (one per physical core) and much more slowly from 4
 to {pmax} threads, because Hyper-Threads share a core's execution units: calibration shows per-thread
 <code>merge2</code> throughput of {m2_rate:.0f}M elements/s alone, {m2_rate4:.0f}M with 4 concurrent threads and
-{m2_rate8:.0f}M with 8 (Figure 7).</li>
+{m2_rate8:.0f}M with 8 (Figure 5).</li>
 <li><b>2-way vs 4-way in parallel:</b> the 4-way version was faster in <b>{wins4} of {len(par_cfgs)}</b> parallel
 configurations. At {pmax} threads and n = {fmt_n(nmax)} it needs {p4['median_s']:.2f} s against {p2['median_s']:.2f} s.</li>
 <li><b>Small arrays</b> (1M) finish in tens of milliseconds; parallel overheads and timer resolution (~1 ms) limit speedup.</li>
@@ -418,15 +459,15 @@ phase. Level i contains M = k<sup>i</sup> independent merges of size s = n/k<sup
 &ldquo;T<sub>1</sub>/p&rdquo; estimate wrong: <b>cache effects</b> (small merges fit in L2/L3), <b>shared DRAM bandwidth</b>,
 and <b>Hyper-Threading contention</b> (per-thread throughput falls when q &gt; 4). The model never sees a full-sort
 timing; it is a genuine prediction.</p>
-{img('calibration_merge.png', '100%', 'Figure 7. Calibration micro-benchmark: merge throughput per thread vs merge size and number of concurrent threads.')}
+{img('calibration_merge.png', '100%', 'Figure 5. Calibration micro-benchmark: merge throughput per thread vs merge size and number of concurrent threads.')}
 
 <h3>6.3 Model accuracy</h3>
 <div style="display:flex;gap:10pt;align-items:flex-start">
-<div style="flex:1">{img('model_accuracy.png', '100%', f'Figure 8. Predicted vs measured for all {S["n_model_points"]} runs of &ge; 0.1 s.')}</div>
-<div style="flex:1">{img('model_breakdown.png', '100%', 'Figure 9. Where the time goes (model), n = ' + fmt_n(nmax) + '. Orange = levels with fewer merges than threads.')}</div>
+<div style="flex:1">{img('model_accuracy.png', '100%', f'Figure 6. Predicted vs measured for all {S["n_model_points"]} runs of &ge; 0.1 s.')}</div>
+<div style="flex:1">{img('model_breakdown.png', '100%', 'Figure 7. Where the time goes (model), n = ' + fmt_n(nmax) + '. Orange = levels with fewer merges than threads.')}</div>
 </div>
 <p>Mean absolute percentage error: <b>{S['mape']:.1f}%</b> over all runs &ge; 0.1 s, <b>{S['mape_large']:.1f}%</b>
-for n &ge; 50M; {100 * S['within15']:.0f}% of predictions are within &plusmn;15%. Figure 9 shows why speedup saturates:
+for n &ge; 50M; {100 * S['within15']:.0f}% of predictions are within &plusmn;15%. Figure 7 shows why speedup saturates:
 at p = {pmax} the top levels, which have fewer merges than threads, account for a large share of the run time even
 though they are a small share of the work. Detailed model-vs-measured values for the large arrays:</p>
 {model_table()}
@@ -443,7 +484,7 @@ not unrelated ready tasks; if none of its children is still queued, the thread s
 split and 16 after two, so threads are rarely starved, and the model fits it well.</p>
 <p>To test this explanation we ran an alternative 2-way version that spawns <i>both</i> halves as tasks
 (<code>pdcsort variants</code>). A waiting parent can then execute one of its own children instead of idling:</p>
-{'' if not var else img('variants.png', '66%', 'Figure 10. Task-spawning strategies, measured (solid) and greedy-scheduling model (dotted).')}
+{'' if not var else img('variants.png', '66%', 'Figure 8. Task-spawning strategies, measured (solid) and greedy-scheduling model (dotted).')}
 {'' if not var else '<table class=small><tr><th>Threads</th>' + ''.join(f'<th>{p}</th>' for p in sorted({r['threads'] for r in var})) + '</tr>' + ''.join('<tr><td>' + lab + '</td>' + ''.join(f'<td>{vget(a, p):.3f}</td>' for p in sorted({r['threads'] for r in var})) + '</tr>' for a, lab in (('par2', '2-way, spawn 1 + continue (s)'), ('par2b', '2-way, spawn both (s)'), ('par4', '4-way (s)'))) + '</table>'}
 <p>Spawning both halves moves the 2-way times towards the model at &ge; 4 threads, which supports the explanation.
 We kept the &ldquo;spawn one + continue&rdquo; form as the main implementation because it is the textbook form described
@@ -451,7 +492,7 @@ in the proposal, and because this comparison is itself a useful result: <b>how t
 how many</b>. The 4-way design avoids the problem by construction.</p>
 
 <h2>7. Task Cutoff Analysis</h2>
-{img('cutoff.png', '68%', 'Figure 11. Run time vs task cutoff for n = 50M on 8 threads (measured and model).')}
+{img('cutoff.png', '68%', 'Figure 9. Run time vs task cutoff for n = 50M on 8 threads (measured and model).')}
 <p>{'' if not cut_best else f"The best cutoff was {cut_best[2]['cutoff']:,} for 2-way ({cut_best[2]['median_s']:.3f} s) and {cut_best[4]['cutoff']:,} for 4-way ({cut_best[4]['median_s']:.3f} s). "}
 With the smallest cutoff ({cut_worst_small.get(2, {}).get('cutoff', 32)} elements, i.e. a task for nearly every node)
 millions of tasks are created. Time rises to {cut_worst_small[2]['median_s']:.2f} s (2-way) and
@@ -496,7 +537,20 @@ task cutoff is chosen sensibly.</p>
 <tr><td>Murtaza (23K-0589)</td><td>Benchmark harness, performance model, graphs and report</td></tr>
 </table>
 
-<h2>Appendix A: Reproducing the Results</h2>
+<h2 class="pb">Appendix A: Detailed Results</h2>
+<p>The raw measurements (<code>results/</code>) and figures (<code>figures/</code>) are generated artefacts and are not
+kept in the repository; this appendix records the remaining numbers so the report is self-contained.
+Appendix B shows how to regenerate everything.</p>
+<h3>A.1 Correctness tests</h3>
+{tests_table()}
+<h3>A.2 Task cutoff sweep (n = 50M, {pmax} threads, median of 3 runs)</h3>
+{cutoff_table()}
+<h3>A.3 Calibration micro-benchmarks</h3>
+{calib_table()}
+<p style="text-align:center;font-size:9pt">Memory copy bandwidth and per-task creation/scheduling cost vs number of
+concurrent threads. Merge throughputs are plotted in Figure 5.</p>
+
+<h2>Appendix B: Reproducing the Results</h2>
 <pre><code>git clone {GITHUB_URL}
 cd parallel-merge-sort-openmp
 mingw32-make            # or: make  /  build.bat

@@ -89,8 +89,8 @@ in `results/summary.csv` (columns `model_s`, `model_err_pct`) and in Figure 8 of
 include/           sort.h, util.h
 src/               mergesort2.c, mergesort4.c, util.c, main.c
 scripts/           model.py, analyze.py, make_report.py, run_all.sh
-results/           raw CSVs (bench, cutoff, calib) + summary.csv/json + logs
-figures/           PNG graphs used in the report
+results/           raw CSVs (bench, cutoff, calib) + summary.csv/json + logs  (generated, git-ignored)
+figures/           PNG graphs used in the report  (generated, git-ignored)
 report/            PDC_Project_Report.pdf
 docs/              VIDEO_SCRIPT.md (2–3 min demo voice-over)
 ```

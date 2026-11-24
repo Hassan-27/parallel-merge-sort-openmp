@@ -3,3 +3,7 @@ bin/
 *.o
 __pycache__/
 report/_build/
+
+# Generated outputs (embedded in report/PDC_Project_Report.pdf; regenerate with scripts/run_all.sh)
+figures/
+results/
