@@ -1,0 +1,26 @@
+Calibrating micro-benchmarks for the performance model (q = 1..8 threads)
+  q=1  copy bandwidth 19.17 GB/s   task overhead 0.03 us
+  q=2  copy bandwidth 24.40 GB/s   task overhead 0.38 us
+  q=3  copy bandwidth 25.70 GB/s   task overhead 0.79 us
+  q=4  copy bandwidth 24.78 GB/s   task overhead 1.17 us
+  q=5  copy bandwidth 24.86 GB/s   task overhead 1.29 us
+  q=6  copy bandwidth 24.16 GB/s   task overhead 2.69 us
+  q=7  copy bandwidth 23.10 GB/s   task overhead 2.73 us
+  q=8  copy bandwidth 23.34 GB/s   task overhead 3.65 us
+  way=2 q=1 merge: 286 233 213 206 128 206 200 200 200 200 200 197 200 197  leaf: 28.9 25.6 22.6 20.2 18.1 16.6 14.9 13.9 12.8  (M elem/s per thread)
+  way=2 q=2 merge: 262 221 210 188 188 194 191 188 175 185 185 175 161 178  leaf: 24.8 22.2 19.1 15.2 12.4 11.4 10.2 9.4 8.9  (M elem/s per thread)
+  way=2 q=3 merge: 163 128 128 114 58 89 77 43 70 130 132 145 145 142  leaf: 20.7 18.8 15.7 14.2 12.8 12.4 11.5 9.4 9.3  (M elem/s per thread)
+  way=2 q=4 merge: 157 107 95 107 109 127 76 120 106 137 131 126 130 123  leaf: 18.5 16.6 14.8 13.2 12.0 11.4 10.2 9.3 9.0  (M elem/s per thread)
+  way=2 q=5 merge: 153 135 130 126 123 125 128 76 113 117 121 122 123 107  leaf: 15.7 14.9 13.4 12.1 8.3 10.0 8.9 8.6 8.0  (M elem/s per thread)
+  way=2 q=6 merge: 132 121 118 114 117 114 110 114 111 113 103 108 114 114  leaf: 16.6 14.2 12.7 11.2 10.5 9.3 8.2 8.2 7.4  (M elem/s per thread)
+  way=2 q=7 merge: 125 108 105 109 44 66 84 114 115 115 112 114 120 118  leaf: 16.4 14.6 13.0 11.4 6.3 5.8 5.9 6.5 5.5  (M elem/s per thread)
+  way=2 q=8 merge: 95 92 84 92 67 91 90 87 104 104 110 110 111 118  leaf: 15.9 13.7 12.0 11.0 9.8 9.2 8.1 6.7 5.7  (M elem/s per thread)
+  way=4 q=1 merge: 168 170 117 92 84 75 62 93 107 115 117 115 117 116  leaf: 32.4 26.4 25.2 21.5 20.8 18.2 17.6 15.7 15.0  (M elem/s per thread)
+  way=4 q=2 merge: 229 233 127 119 118 117 114 114 106 107 77 98 105 110  leaf: 30.0 24.6 21.7 17.6 16.1 13.9 13.3 12.9 13.6  (M elem/s per thread)
+  way=4 q=3 merge: 206 166 125 105 98 95 93 93 91 93 94 95 98 96  leaf: 17.9 18.7 18.1 17.4 12.4 14.0 14.2 12.8 12.0  (M elem/s per thread)
+  way=4 q=4 merge: 155 146 104 95 66 84 85 82 82 86 83 86 87 86  leaf: 21.5 19.7 17.9 15.5 14.7 13.2 12.4 11.5 9.7  (M elem/s per thread)
+  way=4 q=5 merge: 108 95 79 75 77 74 75 77 79 79 77 82 80 81  leaf: 21.0 17.4 16.9 14.2 13.6 11.8 11.0 10.6 10.0  (M elem/s per thread)
+  way=4 q=6 merge: 119 98 79 77 75 75 74 73 73 74 75 76 78 75  leaf: 16.8 14.4 14.4 12.2 12.2 11.4 10.8 9.8 9.0  (M elem/s per thread)
+  way=4 q=7 merge: 96 86 76 74 72 70 70 69 70 70 72 71 73 78  leaf: 18.4 15.7 14.4 12.7 12.1 10.7 10.2 9.0 8.8  (M elem/s per thread)
+  way=4 q=8 merge: 96 76 69 69 69 63 63 66 66 64 67 61 66 61  leaf: 16.6 14.6 12.3 11.5 11.1 10.2 9.6 8.6 8.4  (M elem/s per thread)
+Calibration written.

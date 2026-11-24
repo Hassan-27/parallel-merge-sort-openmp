@@ -1,0 +1,12 @@
+Correctness suite: 33 sizes x 6 distributions x {seq2, seq4, par2, par4 (threads 1,2,3,8; cutoffs 32,100,16384)}
+Reference: C library qsort(); every output is compared element-by-element.
+
+  uniform        :  858 passed, 0 failed
+  sorted         :  858 passed, 0 failed
+  reversed       :  858 passed, 0 failed
+  few-unique     :  858 passed, 0 failed
+  all-equal      :  858 passed, 0 failed
+  nearly-sorted  :  858 passed, 0 failed
+  INT_MIN/MAX    :    4 passed
+
+TOTAL: 5152 passed, 0 failed  ->  ALL TESTS PASSED
