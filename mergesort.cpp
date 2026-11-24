@@ -1,5 +1,3 @@
-// Parallel Merge Sort using OpenMP Tasks (2-Way and 4-Way)
-// PDC Project #20, FAST NUCES Karachi
 // Compile: g++ -O3 -fopenmp mergesort.cpp -o mergesort
 
 #include <iostream>
