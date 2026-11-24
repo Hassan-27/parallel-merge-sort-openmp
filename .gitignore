@@ -1,9 +1,8 @@
-bin/
+# build output
+mergesort
 *.exe
 *.o
 __pycache__/
-report/_build/
 
-# Generated outputs (embedded in report/PDC_Project_Report.pdf; regenerate with scripts/run_all.sh)
-figures/
+# benchmark results (raw CSVs, logs); everything is shown in PDC_Project_Report.pdf
 results/
